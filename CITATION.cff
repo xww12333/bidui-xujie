@@ -3,8 +3,9 @@ title: "比对续接——差异传态网络"
 message: "若引用本仓库，请使用下列元数据。"
 type: software
 authors:
-  - family-names: ting
-    given-names: lei
+  - family-names: Lei
+    given-names: Ting
+    email: xww12333@outlook.com
 repository-code: "https://github.com/xww12333/bidui-xujie"
 url: "https://github.com/xww12333/bidui-xujie"
 abstract: >-

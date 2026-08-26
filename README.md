@@ -282,6 +282,6 @@ python3 scripts/run_all_checks.py --only 4,12,16
 - **正文**（`README.md`、`卷*.md`）：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — 可共享与演绎（含商用），须署名。  
 - **代码**（`scripts/`）：MIT — 见仓库根目录 [`LICENSE`](LICENSE)。
 
-完整说明与署名建议见 [`LICENSE`](LICENSE)。学术引用见 [`CITATION.cff`](CITATION.cff)。
+完整说明与署名建议见 [`LICENSE`](LICENSE)。学术引用见 [`CITATION.cff`](CITATION.cff)。作者：雷庭；联系：xww12333@outlook.com。
 
 **说明：** 本文档为理论推导手稿，**未经同行评议**。开源许可只规范使用与再分发方式，**不代表**文中物理结论、数值预言或学术主张已被实验或学界验证。引用时请区分「许可允许怎么用」与「科学论断是否成立」。卷19 等章节已标明严格度（算出／读法／尝试），请按正文标注阅读。

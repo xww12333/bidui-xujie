@@ -1,5 +1,5 @@
 《比对续接——差异传态网络》开源许可
-Copyright (c) 2026 lei ting
+Copyright (c) 2026 雷庭 (Lei Ting)
 
 本仓库内容分两类，适用不同但兼容的开源许可。使用、复制、修改或分发
 时请遵守对应条款，并在二次传播中保留署名与许可说明。
@@ -28,8 +28,9 @@ Copyright (c) 2026 lei ting
 
   建议署名格式：
     《比对续接——差异传态网络》
-    Copyright (c) 2026 lei ting
+    Copyright (c) 2026 雷庭 (Lei Ting)
     https://github.com/xww12333/bidui-xujie
+    联系：xww12333@outlook.com
     许可：CC BY 4.0
 
 ────────────────────────────────────────────────────────────────────────
@@ -51,13 +52,14 @@ Copyright (c) 2026 lei ting
     请区分「开源许可允许的使用方式」与「科学论断本身的可接受性」。
   · scripts/ 仅用于复算文稿印数，不能代替各卷正文中的推导（见 README）。
   · 若您对某一文件属于「正文」还是「代码」有疑问，以文件路径及上述
-    适用范围为准；仍无法判断时，请按更严格的一侧处理或联系版权持有人。
+    适用范围为准；仍无法判断时，请按更严格的一侧处理或联系版权持有人
+    （xww12333@outlook.com）。
 
 ================================================================================
 MIT License
 ================================================================================
 
-Copyright (c) 2026 lei ting
+Copyright (c) 2026 雷庭 (Lei Ting)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
