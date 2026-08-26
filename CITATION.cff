@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "比对续接——差异传态网络"
+message: "若引用本仓库，请使用下列元数据。"
+type: software
+authors:
+  - family-names: ting
+    given-names: lei
+repository-code: "https://github.com/xww12333/bidui-xujie"
+url: "https://github.com/xww12333/bidui-xujie"
+abstract: >-
+  从「差异存在」出发，以不可约比对持续续接为生成活动，经四元数记录与传态网络，
+  推导粒子谱、耦合、时空、G 与 ℏ 等结构；含日常物理读法索引及 Bell/CHSH 纠缠、
+  测量本质等章。理论手稿，未经同行评议。
+keywords:
+  - theoretical physics
+  - quaternions
+  - transfer network
+  - open theory
+license: CC-BY-4.0
