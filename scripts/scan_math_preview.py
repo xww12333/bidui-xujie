@@ -13,11 +13,14 @@ def vol_num(path: str) -> int:
 
 
 def scan() -> None:
-    risk: dict[int, list[tuple[int, str, str]]] = defaultdict(list)
-    stats: dict[int, dict[str, int]] = {}
+    risk: dict[str, list[tuple[int, str, str]]] = defaultdict(list)
+    stats: dict[str, dict[str, int]] = {}
 
-    for path in sorted(glob.glob("卷*.md"), key=vol_num):
-        v = vol_num(path)
+    def sort_key(path: str):
+        return (vol_num(path), 1 if "补" in path else 0, path)
+
+    for path in sorted(glob.glob("卷*.md"), key=sort_key):
+        v = path.replace("\\", "/").split("/")[-1].removeprefix("卷").removesuffix(".md")
         lines = open(path, encoding="utf-8").read().splitlines()
         s = {"lines": len(lines), "inline": 0, "display": 0, "table_math": 0, "boxed": 0}
         in_code = False
@@ -71,9 +74,13 @@ def scan() -> None:
                     k += 1
         stats[v] = s
 
+    def key_order(v: str):
+        n = int(re.search(r"\d+", v).group())
+        return (n, 1 if "补" in v else 0, v)
+
     print("卷 | 行数 | 行内$ | 块级$$ | 表内$ | boxed")
     print("---:|---:|---:|---:|---:|---:")
-    for v in sorted(stats):
+    for v in sorted(stats, key=key_order):
         s = stats.get(v, {})
         print(f"{v} | {s.get('lines',0)} | {s.get('inline',0)} | {s.get('display',0)} | {s.get('table_math',0)} | {s.get('boxed',0)}")
 
@@ -82,7 +89,7 @@ def scan() -> None:
     if not total:
         print("无已知结构性风险。")
         return
-    for v in sorted(risk):
+    for v in sorted(risk, key=key_order):
         if not risk[v]:
             continue
         print(f"### 卷{v}（{len(risk[v])} 项）\n")
