@@ -17,7 +17,7 @@ def scan() -> None:
     stats: dict[str, dict[str, int]] = {}
 
     def sort_key(path: str):
-        return (vol_num(path), 1 if "补" in path else 0, path)
+        return (vol_num(path), 1 if "下" in path else 0, path)
 
     for path in sorted(glob.glob("卷*.md"), key=sort_key):
         v = path.replace("\\", "/").split("/")[-1].removeprefix("卷").removesuffix(".md")
@@ -76,7 +76,7 @@ def scan() -> None:
 
     def key_order(v: str):
         n = int(re.search(r"\d+", v).group())
-        return (n, 1 if "补" in v else 0, v)
+        return (n, 1 if "下" in v else 0, v)
 
     print("卷 | 行数 | 行内$ | 块级$$ | 表内$ | boxed")
     print("---:|---:|---:|---:|---:|---:")
