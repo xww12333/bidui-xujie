@@ -44,11 +44,13 @@ def scan() -> None:
                 risk[v].append((i, "$ 内含 <（部分预览当 HTML）", line.strip()[:80]))
             if line.strip().startswith("|") and "$" in line and "\\|" in line:
                 risk[v].append((i, "表内 \\\\|（偶发拆列）", line.strip()[:80]))
+            if "\\operatorname" in line:
+                risk[v].append((i, "operatorname（GitHub 禁此宏）", line.strip()[:80]))
         stats[v] = s
 
     print("卷 | 行数 | 行内$ | 块级$$ | 表内$ | boxed")
     print("---:|---:|---:|---:|---:|---:")
-    for v in range(1, 18):
+    for v in sorted(stats):
         s = stats.get(v, {})
         print(f"{v} | {s.get('lines',0)} | {s.get('inline',0)} | {s.get('display',0)} | {s.get('table_math',0)} | {s.get('boxed',0)}")
 
@@ -57,7 +59,7 @@ def scan() -> None:
     if not total:
         print("无已知结构性风险。")
         return
-    for v in range(1, 18):
+    for v in sorted(risk):
         if not risk[v]:
             continue
         print(f"### 卷{v}（{len(risk[v])} 项）\n")
