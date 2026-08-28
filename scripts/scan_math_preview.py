@@ -46,6 +46,27 @@ def scan() -> None:
                 risk[v].append((i, "表内 \\\\|（偶发拆列）", line.strip()[:80]))
             if "\\operatorname" in line:
                 risk[v].append((i, "operatorname（GitHub 禁此宏）", line.strip()[:80]))
+            in_math = False
+            k = 0
+            while k < len(line):
+                if line[k] == "$":
+                    if k + 1 < len(line) and line[k + 1] == "$":
+                        k += 2
+                        continue
+                    if not in_math:
+                        prev = line[k - 1] if k else ""
+                        ok = (not prev) or prev.isspace() or (
+                            prev.isascii() and not prev.isalnum() and prev not in "_\\"
+                        )
+                        if not ok:
+                            risk[v].append((i, "开 $ 左邻非空格/英文标点（GitHub 不认）", line.strip()[:80]))
+                            break
+                        in_math = True
+                    else:
+                        in_math = False
+                    k += 1
+                else:
+                    k += 1
         stats[v] = s
 
     print("卷 | 行数 | 行内$ | 块级$$ | 表内$ | boxed")
