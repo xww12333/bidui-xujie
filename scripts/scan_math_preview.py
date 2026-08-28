@@ -44,6 +44,8 @@ def scan() -> None:
                 risk[v].append((i, "$ 内含 <（部分预览当 HTML）", line.strip()[:80]))
             if line.strip().startswith("|") and "$" in line and "\\|" in line:
                 risk[v].append((i, "表内 \\\\|（偶发拆列）", line.strip()[:80]))
+            if re.match(r"^#{1,6} ", line) and "$" in line:
+                risk[v].append((i, "标题内 $（GitHub 标题不渲公式）", line.strip()[:80]))
             if "\\operatorname" in line:
                 risk[v].append((i, "operatorname（GitHub 禁此宏）", line.strip()[:80]))
             in_math = False
