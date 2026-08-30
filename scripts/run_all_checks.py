@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-VOLUMES = list(range(1, 20)) + [24]  # 1–19 有脚本；20–23 无独立核验入口；24 衰变四档
+VOLUMES = list(range(1, 20)) + [24, 25]  # 1–19 有脚本；20–23 无独立核验入口；24–25 衰变／手征
 
 
 def main() -> int:

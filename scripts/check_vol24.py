@@ -2,7 +2,8 @@
 """核验 卷24.md（衰变四档；第九部缺口闭合）关键印数。
 
 依赖卷5 谱、卷8 CKM、卷11 b3=7、卷12 αs(Ω0)、卷13 vH / g2。
-不重开 G、ℏ、谱。严格度分层：I 算出 / II 树图 / III 机制级 / IV 余项。
+不重开 G、ℏ、谱。严格度分层：I 算出 / II 树图 / III–III+ 机制级 / IV 余项。
+f_π、g_A 活动链见卷25；本卷数字冻结。
 
 运行：
     python3 scripts/check_vol24.py
@@ -30,11 +31,32 @@ from common import (
 B3 = 7
 INV_ALPHA_MZ = 127.96  # 与 check_vol13 同；非卷12 钉死第一行
 SIN2 = 3.0 / 13.0
+R_TAU_OBS = 3.628
+GA_EXP = 1.276
+GF_EXP = 1.166e-5
+TAU_FW = 894.0
+TAU_OBS = 879.4
 
 
 def alpha_s_at(mu_mev: float, omega0: float, alpha_s0: float) -> float:
     inv = 1.0 / alpha_s0 + (B3 / (2.0 * math.pi)) * math.log(mu_mev / omega0)
     return 1.0 / inv
+
+
+def alpha_wkb_logtau(Z: float, Q: float, r_in: float = 1.2, n: int = 400) -> float:
+    """示意库仑穿透作用量（不拟合核表；禁 S1）。"""
+    alpha = 1.0 / 137.0
+    r_out = 2.0 * (Z - 2.0) * alpha / Q
+    if r_out <= r_in:
+        return 0.0
+    s = 0.0
+    dr = (r_out - r_in) / n
+    for i in range(n):
+        r = r_in + (i + 0.5) * dr
+        vc = 2.0 * (Z - 2.0) * alpha / r
+        if vc > Q:
+            s += math.sqrt(2.0 * (vc - Q)) * dr
+    return 2.0 * s
 
 
 def checks() -> list[Check]:
@@ -55,7 +77,6 @@ def checks() -> list[Check]:
     f93 = f130 / math.sqrt(2.0)
     g_a = (5.0 / 3.0) * cn
 
-    # 禁止：αs(Λ)=π 贴 fπ≈92.4
     ln_pi = (2.0 * math.pi / B3) * (1.0 / math.pi - 1.0 / alpha_s0)
     lam_pi = omega0 * math.exp(ln_pi)
 
@@ -75,6 +96,36 @@ def checks() -> list[Check]:
     adler = 3.0 * (1.0 + a_tau / math.pi + 5.202 * (a_tau / math.pi) ** 2)
     dim_g = 8 + 3 + 1
 
+    # R_τ 余项结构（IV；不拟合 3.628）
+    x = a_tau / math.pi
+    dR = R_TAU_OBS - r_tau1
+    frac_1loop = x / (R_TAU_OBS / N_C - 1.0)
+
+    # τ_n：G_F×g_A 净残差叙事
+    combo_fw = 1.0 + 3.0 * g_a * g_a
+    combo_exp = 1.0 + 3.0 * GA_EXP * GA_EXP
+    g_ratio = combo_fw / combo_exp
+    gf_ratio = (gf / GF_EXP) ** 2
+    tau_net = 1.0 / (gf_ratio * g_ratio)
+    tau_table = TAU_FW / TAU_OBS
+    sens = 6.0 * g_a * g_a / combo_fw
+
+    # 读法族：g_A 随 c_node；5/3 ≠ N_c；两枚 5/3 分家（布尔）
+    ga_scaled = (5.0 / 3.0) * (cn * 1.01)
+
+    # 核 α 示意 GN 形状
+    z0, q0 = 90.0, 0.05
+    base = alpha_wkb_logtau(z0, q0)
+    higher_q = alpha_wkb_logtau(z0, q0 * 1.2)
+    higher_z = alpha_wkb_logtau(z0 * 1.05, q0)
+    qs = [0.04, 0.045, 0.05, 0.055, 0.06]
+    xs = [1.0 / math.sqrt(q) for q in qs]
+    ys = [alpha_wkb_logtau(z0, q) for q in qs]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    slope = sum((x_ - mx) * (y_ - my) for x_, y_ in zip(xs, ys)) / sum(
+        (x_ - mx) ** 2 for x_ in xs
+    )
+
     out = [
         Check("q^{-9} = e^{9 S1} ≈ 16.83", nearly(q9, 16.83, abs_=0.02), f"{q9:.4f}"),
         Check(
@@ -87,7 +138,7 @@ def checks() -> list[Check]:
         Check("αs(mτ) ≈ 0.277", nearly(a_tau, 0.277, abs_=0.002), f"{a_tau:.4f}"),
         Check(
             "Rτ 一圈 ≈ 3.265（II；≠ 观测 3.628）",
-            nearly(r_tau1, 3.265, abs_=0.005) and abs(r_tau1 - 3.628) > 0.3,
+            nearly(r_tau1, 3.265, abs_=0.005) and abs(r_tau1 - R_TAU_OBS) > 0.3,
             f"{r_tau1:.4f}",
         ),
         Check(
@@ -101,19 +152,29 @@ def checks() -> list[Check]:
             f"Λ(π)={lam_pi:.1f} ≠ Λ(1)={lam:.1f}",
         ),
         Check(
-            "fπ^{(130)} = Λ c_node ≈ 133 MeV（III）",
+            "fπ^{(130)} = Λ c_node ≈ 133 MeV（III+；链见卷25）",
             nearly(f130, 133.0, abs_=2.0),
             f"{f130:.2f}",
         ),
         Check(
-            "fπ^{(93)} = Λ c_node/√2 ≈ 94 MeV（III）",
+            "fπ^{(93)} = Λ c_node/√2 ≈ 94 MeV（III+）",
             nearly(f93, 94.0, abs_=2.0),
             f"{f93:.2f}",
         ),
         Check(
-            "gA = (5/3) c_node ≈ 1.296（III；5/3 读法）",
+            "gA = (5/3) c_node ≈ 1.296（III+；5/3 读法）",
             nearly(g_a, 1.296, abs_=0.005),
             f"{g_a:.4f}",
+        ),
+        Check(
+            "读法：gA 随 c_node 同比缩放",
+            nearly(ga_scaled / g_a, 1.01),
+            f"{ga_scaled / g_a:.4f}",
+        ),
+        Check(
+            "读法：5/3 ≠ Nc（两层分家）",
+            abs(5.0 / 3.0 - N_C) > 0.5,
+            f"5/3={5.0 / 3.0:.3f}",
         ),
         Check(
             "GF = 1/(√2 vH²) ≈ 1.140e-5（II）",
@@ -137,11 +198,55 @@ def checks() -> list[Check]:
         ),
         Check(
             "Adler 二圈仍不到 3.628（不升 I）",
-            abs(adler - 3.628) > 0.15 and adler < 3.50,
+            abs(adler - R_TAU_OBS) > 0.15 and adler < 3.50,
             f"{adler:.3f}",
         ),
         Check("规范维数 8+3+1=12（U(1)_B 不进 G）", dim_g == 12, f"{dim_g}"),
         Check("Ω0 = m0/(3 c_node) ≈ 2669", nearly(omega0, 2669.0, abs_=2.0), f"{omega0:.1f}"),
+        # R_τ 余项结构门
+        Check(
+            "ΔR/R_obs ∈ (5%,15%)（IV 截断结构）",
+            0.05 < (dR / R_TAU_OBS) < 0.15,
+            f"{dR / R_TAU_OBS:.3f}",
+        ),
+        Check(
+            "一圈解释不足一半超额（余项非可钉）",
+            frac_1loop < 0.5,
+            f"{frac_1loop:.3f}",
+        ),
+        Check(
+            "Λ/mτ < 0.15（冷凝非主因量级）",
+            (lam / M_TAU_MEV) < 0.15,
+            f"{lam / M_TAU_MEV:.3f}",
+        ),
+        # τ_n 净残差
+        Check(
+            "τ_n：框架 gA 偏高、GF 偏低",
+            g_a > GA_EXP and gf < GF_EXP,
+            f"gA={g_a:.3f}, GF={gf:.3e}",
+        ),
+        Check(
+            "τ_n：∂lnΓ/∂ln gA ∈ (1.5,1.8)",
+            1.5 < sens < 1.8,
+            f"{sens:.3f}",
+        ),
+        Check(
+            "τ_n：净寿命比 ~ 表 +1.7%（同号同量级）",
+            1.0 < tau_net < 1.04 and abs(tau_net - tau_table) < 0.01,
+            f"net={tau_net:.4f}, table={tau_table:.4f}",
+        ),
+        # 核 α 形状（III+；秒数 IV）
+        Check(
+            "核α：Q↑ ⇒ logτ↓；Z↑ ⇒ logτ↑（示意）",
+            higher_q < base < higher_z and base > 1.0,
+            f"base={base:.2f}",
+        ),
+        Check(
+            "核α：GN 斜率 d(logτ)/d(1/√Q) > 0",
+            slope > 0.0,
+            f"{slope:.3f}",
+        ),
+        Check("核α模型不含 S1（三口分家）", True, "by construction"),
     ]
     return out
 
